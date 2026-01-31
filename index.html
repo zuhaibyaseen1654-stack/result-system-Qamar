@@ -1,0 +1,36 @@
+function search(){
+  let r = rollInput.value;
+
+  fetch("یہاں_اپنا_ویب_ایپ_لنک_لگائیں?roll=" + r)
+  .then(res => res.json())
+  .then(f => {
+
+    if(!f.found){
+      output.innerHTML = "❌ رزلٹ موجود نہیں";
+      return;
+    }
+
+    let total = f.subjects.reduce((a,b)=>a+b.marks,0);
+    let max = f.subjects.length * 100;
+    let per = (total/max*100).toFixed(2);
+    let status = per >= 40 ? "پاس" : "ناکام";
+
+    let html = `<div id="cert" style="direction:rtl;text-align:right">
+    <h3>${f.name}</h3>
+    <p>والد کا نام: ${f.father}</p>
+    <p>کلاس: ${f.class}</p>
+    <table>
+      <tr><th>مضمون</th><th>نمبر</th></tr>`;
+
+    f.subjects.forEach(s=>{
+      html += `<tr><td>${s.name}</td><td>${s.marks}</td></tr>`;
+    });
+
+    html += `</table>
+    <h4>فیصد: ${per}%</h4>
+    <h4>نتیجہ: ${status}</h4>
+    </div>`;
+
+    output.innerHTML = html;
+  });
+}
