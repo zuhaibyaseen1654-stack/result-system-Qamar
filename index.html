@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>نظام نتائج</title>
+<style>
+body{font-family:Urdu Typesetting;background:#eef;text-align:right}
+.container{max-width:900px;margin:auto;background:#fff;padding:20px}
+input,button{padding:6px;margin:4px;width:95%}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #333;padding:6px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h2>جامعہ اسلامیہ انوار العلوم العلمية</h2>
+
+<!-- Student Search -->
+<input id="rollInput" placeholder="رول نمبر لکھیں">
+<button onclick="search()">رزلٹ دیکھیں</button>
+<div id="output"></div>
+
+<hr>
+
+<!-- Admin Login -->
+<div id="loginBox">
+<input id="adminPass" type="password" placeholder="ایڈمن پاسورڈ">
+<button onclick="loginAdmin()">لاگ ان</button>
+</div>
+
+<!-- Admin Form -->
+<div id="adminBox" class="hidden">
+<h3>ایڈمن انٹری</h3>
+<input id="aroll" placeholder="رول نمبر">
+<input id="aname" placeholder="نام">
+<input id="afather" placeholder="والد">
+<input id="aclass" placeholder="کلاس">
+<input id="asubject" placeholder="مضمون">
+<input id="amarks" type="number" placeholder="نمبر">
+<button onclick="saveResult()">محفوظ کریں</button>
+</div>
+
+</div>
+
+<script>
+const API="WEB_APP_URL"; // یہاں اپنا Apps Script URL لگائیں
+
+function search(){
+fetch(API+"?roll="+rollInput.value)
+.then(r=>r.json())
+.then(f=>{
+ if(!f.found){output.innerHTML="❌ رزلٹ نہیں ملا";return;}
+ let total=0; let supply=false;
+ f.subjects.forEach(s=>{total+=s.marks;if(s.marks<40)supply=true;});
+ let per=(total/(f.subjects.length*100)*100).toFixed(2);
+
+ let h=`<h3>${f.name}</h3>
+ <p>والد: ${f.father}</p>
+ <p>کلاس: ${f.class}</p>
+ <table><tr><th>مضمون</th><th>نمبر</th></tr>`;
+ f.subjects.forEach(s=>{
+ h+=`<tr><td>${s.name}</td><td>${s.marks}</td></tr>`;
+ });
+ h+=`</table>
+ <p>فیصد: ${per}%</p>
+ <p>نتیجہ: ${supply?"سپلائی":"پاس"}</p>`;
+ output.innerHTML=h;
+});
+}
+
+function loginAdmin(){
+ if(adminPass.value==="Qamar1654"){
+  loginBox.style.display="none";
+  adminBox.style.display="block";
+ }else alert("غلط پاسورڈ");
+}
+
+function saveResult(){
+ fetch(API,{
+ method:"POST",
+ body:JSON.stringify({
+ roll:aroll.value,name:aname.value,father:afather.value,
+ class:aclass.value,subject:asubject.value,marks:amarks.value,
+ prc:Math.floor(1000+Math.random()*9000)
+ })
+ }).then(r=>r.text()).then(a=>alert(a));
+}
+</script>
+</body>
+</html>
